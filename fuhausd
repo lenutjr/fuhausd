@@ -1,0 +1,136 @@
+getgenv().Config = {}
+
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "Push Simulator (Fuh Riley)", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+local Tab = Window:MakeTab({
+	Name = "Main",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local Section = Tab:AddSection({
+	Name = "Autofarm"
+})
+
+Tab:AddToggle({
+	Name = "Auto Train",
+	Default = false,
+	Callback = function(v)
+		Config.autoTrain = v
+        spawn(autoTrain)
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Auto Push",
+	Default = false,
+	Callback = function(v)
+        Config.autoPush = v
+        spawn(autoPush)
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Auto Rebirth",
+	Default = false,
+	Callback = function(v)
+        Config.autoRebirth = v
+        spawn(autoRebirth)
+	end    
+})
+
+local Section = Tab:AddSection({
+	Name = "Auto PVP NPCS"
+})
+
+local wrldTables = {}
+
+for _, v in pairs(workspace.Map.Worlds:GetChildren()) do
+    if v:IsA("Folder") then
+        table.insert(wrldTables, v.Name)
+    end
+end
+
+local worldOptions = {"None"}
+
+for _, v in pairs(wrldTables) do
+    table.insert(worldOptions, v)
+end
+
+Tab:AddDropdown({
+	Name = "World",
+	Default = "None",
+	Options = worldOptions,
+	Callback = function(world)
+		selectedWorld = world
+	end    
+})
+
+local Levels = {}
+local NPCMobs = {}
+
+for _, v in pairs(workspace.Map.Worlds:GetDescendants()) do
+    if v.Name == "Spawner" and v.Parent:IsA("Folder") then
+        if v.Parent.Name ~= "Stage" and not Levels[v.Parent.Name] then
+            table.insert(NPCMobs, v.Parent.Name)
+            Levels[v.Parent.Name] = true 
+        end
+    end
+end
+
+local NPCOptions = {"None"}
+
+for _, v in pairs(NPCMobs) do
+    table.insert(NPCOptions, v)
+end
+
+Tab:AddDropdown({
+	Name = "NPC Levels",
+	Default = "None",
+	Options = NPCOptions,
+	Callback = function(level)
+		selectedLevel = level
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Auto Fight NPC",
+	Default = false,
+	Callback = function(v)
+        Config.autoFight = v
+        spawn(autoFight)
+	end    
+})
+
+OrionLib:Init()
+
+function autoTrain()
+    while task.wait() and Config.autoTrain do
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PowerGain"):FireServer()
+    end
+end
+
+function autoPush()
+    while task.wait() and Config.autoPush do
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PushGain"):FireServer()
+    end
+end
+
+function autoRebirth()
+    while task.wait() and Config.autoRebirth do
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Rebirth"):FireServer()
+    end
+end
+
+function autoFight()
+    while task.wait() and Config.autoFight do
+        local args = {
+            [1] = workspace:WaitForChild("Map"):WaitForChild("Worlds"):WaitForChild(selectedWorld):WaitForChild("Levels"):WaitForChild(selectedLevel):WaitForChild("Spawner"),
+            [2] = 5.373063564300537,
+            [3] = "Simulate"
+        }
+            
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Push"):FireServer(unpack(args))
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PushGain"):FireServer()
+    end
+end
