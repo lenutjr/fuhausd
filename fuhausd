@@ -14,6 +14,12 @@ local Egg = Window:MakeTab({
 	PremiumOnly = false
 })
 
+local Misc = Window:MakeTab({
+	Name = "Misc",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
 local Section = Tab:AddSection({
 	Name = "Autofarm"
 })
@@ -153,6 +159,20 @@ Egg:AddToggle({
 	end    
 })
 
+Misc:AddButton({
+	Name = "Claim Codes!",
+	Callback = function()
+      	claimCodes()
+  	end    
+})
+
+Misc:AddButton({
+	Name = "AntiAFK",
+	Callback = function()
+      	antiAFK()
+  	end    
+})
+
 OrionLib:Init()
 
 function autoTrain()
@@ -208,4 +228,21 @@ function autoReward()
             end
         end
     end
+end
+
+function claimCodes()
+    local Codes = {"700kMEMBERS", "600kMEMBERS", "Get5Spins!", "MarineWorld", "400kMEMBERS", "10MVisits", "250kMEMBERS", "TurboByte", "Mauo", "Carot", "2MVisitsO", "3MVisitsO", "1MVisitsO", "FIRSTUPDATE", "PUSH"}
+
+    for _, v in pairs(Codes) do
+    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Codes"):InvokeServer(v)
+    end
+end
+
+function antiAFK()
+    local vu = game:GetService("VirtualUser")
+    game:GetService("Players").LocalPlayer.Idled:connect(function()
+       vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+       wait(1)
+       vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    end)
 end
