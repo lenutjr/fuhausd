@@ -195,6 +195,24 @@ Egg:AddTextbox({
 	end	  
 })
 
+Egg:AddTextbox({
+	Name = "Auto Delete While Opening",
+	Default = "",
+	TextDisappear = false,
+	Callback = function(v5)
+		pet5 = v5
+	end	  
+})
+
+Egg:AddTextbox({
+	Name = "Auto Delete While Opening",
+	Default = "",
+	TextDisappear = false,
+	Callback = function(v6)
+		pet6 = v6
+	end	  
+})
+
 Egg:AddToggle({
 	Name = "Auto Open Egg",
 	Default = false,
@@ -259,6 +277,8 @@ function autoEgg()
         if pet2 and pet2 ~= "" then petsToDelete[pet2] = true end
         if pet3 and pet3 ~= "" then petsToDelete[pet3] = true end
         if pet4 and pet4 ~= "" then petsToDelete[pet4] = true end
+	if pet5 and pet5 ~= "" then petsToDelete[pet5] = true end
+	if pet6 and pet6 ~= "" then petsToDelete[pet6] = true end
 
         local args = {
             [1] = "Hatch1",
