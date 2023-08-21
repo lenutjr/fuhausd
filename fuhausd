@@ -159,29 +159,6 @@ Egg:AddDropdown({
 	end    
 })
 
-Egg:AddToggle({
-	Name = "Auto Open Egg",
-	Default = false,
-	Callback = function(v)
-        Config.autoEgg = v
-        spawn(autoEgg)
-	end    
-})
-
-Misc:AddButton({
-	Name = "Claim Codes!",
-	Callback = function()
-      	claimCodes()
-  	end    
-})
-
-Misc:AddButton({
-	Name = "AntiAFK",
-	Callback = function()
-      	antiAFK()
-  	end    
-})
-
 Egg:AddTextbox({
 	Name = "Auto Delete While Opening",
 	Default = "",
@@ -216,6 +193,29 @@ Egg:AddTextbox({
 	Callback = function(v4)
 		pet4 = v4
 	end	  
+})
+
+Egg:AddToggle({
+	Name = "Auto Open Egg",
+	Default = false,
+	Callback = function(v)
+        Config.autoEgg = v
+        spawn(autoEgg)
+	end    
+})
+
+Misc:AddButton({
+	Name = "Claim Codes!",
+	Callback = function()
+      	claimCodes()
+  	end    
+})
+
+Misc:AddButton({
+	Name = "AntiAFK",
+	Callback = function()
+      	antiAFK()
+  	end    
 })
 
 OrionLib:Init()
