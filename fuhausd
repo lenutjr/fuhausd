@@ -127,6 +127,15 @@ Tab:AddToggle({
 	end    
 })
 
+Tab:AddToggle({
+	Name = "Auto Spin",
+	Default = false,
+	Callback = function(v)
+        Config.autoSpin = v
+        spawn(autoSpin)
+	end    
+})
+
 local eggTable = {}
 
 for _, v in pairs(workspace.Map.Eggs:GetChildren()) do
@@ -219,14 +228,28 @@ function autoEgg()
 end
 
 function autoReward()
-    while task.wait() and Config.autoReward do
+    while Config.autoReward do
         for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.UI.Pages.Playtime_rewards.Main.Main:GetChildren()) do
             if v:IsA("Frame") then
                 if v:FindFirstChild("Timer").Text == "Claim!" then
                     game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PlaytimeRewards"):FireServer(v.Name)
                 end
+                task.wait(0.1)
             end
         end
+    end
+end
+
+function autoSpin()
+        while Config.autoSpin do
+            local spinAmount = game:GetService("Players").LocalPlayer.PlayerGui.UI.Pages.Spins.Main.Spin.Quantity.Text
+
+            spinAmount = spinAmount:gsub("x", "")
+
+            if spinAmount > "0" then
+            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Spins"):FireServer()
+        end
+        task.wait(0.1)
     end
 end
 
