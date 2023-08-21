@@ -8,6 +8,12 @@ local Tab = Window:MakeTab({
 	PremiumOnly = false
 })
 
+local Egg = Window:MakeTab({
+	Name = "Egg",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
 local Section = Tab:AddSection({
 	Name = "Autofarm"
 })
@@ -102,6 +108,51 @@ Tab:AddToggle({
 	end    
 })
 
+local Section = Tab:AddSection({
+	Name = "Other Auto Stuff"
+})
+
+Tab:AddToggle({
+	Name = "Auto Claim Rewards",
+	Default = false,
+	Callback = function(v)
+        Config.autoReward = v
+        spawn(autoReward)
+	end    
+})
+
+local eggTable = {}
+
+for _, v in pairs(workspace.Map.Eggs:GetChildren()) do
+    if v:IsA("Model") then
+        table.insert(eggTable, v.Name)
+    end
+end
+
+local eggOptions = {"None"}
+
+for _, v in pairs(eggTable) do
+    table.insert(eggOptions, v)
+end
+
+Egg:AddDropdown({
+	Name = "Eggs",
+	Default = "None",
+	Options = eggOptions,
+	Callback = function(egg)
+		selectedEgg = egg
+	end    
+})
+
+Egg:AddToggle({
+	Name = "Auto Open Egg",
+	Default = false,
+	Callback = function(v)
+        Config.autoEgg = v
+        spawn(autoEgg)
+	end    
+})
+
 OrionLib:Init()
 
 function autoTrain()
@@ -117,8 +168,9 @@ function autoPush()
 end
 
 function autoRebirth()
-    while task.wait() and Config.autoRebirth do
+    while Config.autoRebirth do
         game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Rebirth"):FireServer()
+        task.wait(0.5)
     end
 end
 
@@ -132,5 +184,28 @@ function autoFight()
             
         game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Push"):FireServer(unpack(args))
         game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PushGain"):FireServer()
+    end
+end
+
+function autoEgg()
+    while task.wait() and Config.autoEgg do
+        local args = {
+            [1] = "Hatch1",
+            [2] = selectedEgg,
+            [3] = {}
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Hatch"):FireServer(unpack(args))
+    end        
+end
+
+function autoReward()
+    while task.wait() and Config.autoReward do
+        for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.UI.Pages.Playtime_rewards.Main.Main:GetChildren()) do
+            if v:IsA("Frame") then
+                if v:FindFirstChild("Timer").Text == "Claim!" then
+                    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PlaytimeRewards"):FireServer(v.Name)
+                end
+            end
+        end
     end
 end
