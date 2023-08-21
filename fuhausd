@@ -182,6 +182,45 @@ Misc:AddButton({
   	end    
 })
 
+local Section = Egg:AddSection({
+	Name = "Auto Delete"
+})
+
+local petNamesToDelete = {}
+
+local petsToDeleteLabel = Egg:AddLabel("Selected Pets: "..table.concat(petNamesToDelete, ", "))
+
+local function updatePetsToDeleteLabel()
+    petsToDeleteLabel:Set("Selected Pets: "..table.concat(petNamesToDelete, ", "))
+end
+
+Egg:AddTextbox({
+    Name = "Pet to Delete",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(Value)
+        table.insert(petNamesToDelete, Value)
+        updatePetsToDeleteLabel()
+    end	  
+})
+
+Egg:AddButton({
+    Name = "Clear Pet Names",
+    Callback = function()
+        petNamesToDelete = {}
+            updatePetsToDeleteLabel()
+    end    
+})
+
+Egg:AddToggle({
+	Name = "Auto Delete Pet",
+	Default = false,
+	Callback = function(v)
+        Config.autoDelete = v
+        spawn(autoDelete)
+	end    
+})
+
 OrionLib:Init()
 
 function autoTrain()
@@ -268,4 +307,28 @@ function antiAFK()
        wait(1)
        vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
     end)
+end
+
+function autoDelete()
+    while task.wait() and Config.autoDelete do
+        for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.UI.Pages.Pets.Main.Main:GetDescendants()) do
+            if v.Name == "Craft" then
+                local petName = v.Parent:FindFirstChild("PetName").Value
+                if petName and petName ~= "Space" and table.find(petNamesToDelete, petName) then
+                    for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.UI.Pages.Pets.Main.Main:GetDescendants()) do
+                        if v.Name == "Check" and v:IsA("Frame") and v.Visible ~= true then
+                            local args = {
+                                [1] = "Delete",
+                                [2] = {
+                                    [1] = v.Parent.Parent.Name
+                                }
+                            }
+                            
+                            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PetFunctions"):InvokeServer(unpack(args))
+                        end
+                    end
+                end
+            end
+        end
+    end
 end
