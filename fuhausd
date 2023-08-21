@@ -182,43 +182,40 @@ Misc:AddButton({
   	end    
 })
 
-local Section = Egg:AddSection({
-	Name = "Auto Delete"
+Egg:AddTextbox({
+	Name = "Auto Delete While Opening",
+	Default = "",
+	TextDisappear = false,
+	Callback = function(v1)
+		pet1 = v1
+	end	  
 })
-
-local petNamesToDelete = {}
-
-local petsToDeleteLabel = Egg:AddLabel("Selected Pets: "..table.concat(petNamesToDelete, ", "))
-
-local function updatePetsToDeleteLabel()
-    petsToDeleteLabel:Set("Selected Pets: "..table.concat(petNamesToDelete, ", "))
-end
 
 Egg:AddTextbox({
-    Name = "Pet to Delete",
-    Default = "",
-    TextDisappear = true,
-    Callback = function(Value)
-        table.insert(petNamesToDelete, Value)
-        updatePetsToDeleteLabel()
-    end	  
+	Name = "Auto Delete While Opening",
+	Default = "",
+	TextDisappear = false,
+	Callback = function(v2)
+		pet2 = v2
+	end	  
 })
 
-Egg:AddButton({
-    Name = "Clear Pet Names",
-    Callback = function()
-        petNamesToDelete = {}
-            updatePetsToDeleteLabel()
-    end    
+Egg:AddTextbox({
+	Name = "Auto Delete While Opening",
+	Default = "",
+	TextDisappear = false,
+	Callback = function(v3)
+		pet3 = v3
+	end	  
 })
 
-Egg:AddToggle({
-	Name = "Auto Delete Pet",
-	Default = false,
-	Callback = function(v)
-        Config.autoDelete = v
-        spawn(autoDelete)
-	end    
+Egg:AddTextbox({
+	Name = "Auto Delete While Opening",
+	Default = "",
+	TextDisappear = false,
+	Callback = function(v4)
+		pet4 = v4
+	end	  
 })
 
 OrionLib:Init()
@@ -257,11 +254,18 @@ end
 
 function autoEgg()
     while task.wait() and Config.autoEgg do
+        local petsToDelete = {}
+        if pet1 and pet1 ~= "" then petsToDelete[pet1] = true end
+        if pet2 and pet2 ~= "" then petsToDelete[pet2] = true end
+        if pet3 and pet3 ~= "" then petsToDelete[pet3] = true end
+        if pet4 and pet4 ~= "" then petsToDelete[pet4] = true end
+
         local args = {
             [1] = "Hatch1",
             [2] = selectedEgg,
-            [3] = {}
+            [3] = petsToDelete
         }
+        
         game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Hatch"):FireServer(unpack(args))
     end        
 end
@@ -307,28 +311,4 @@ function antiAFK()
        wait(1)
        vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
     end)
-end
-
-function autoDelete()
-    while task.wait() and Config.autoDelete do
-        for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.UI.Pages.Pets.Main.Main:GetDescendants()) do
-            if v.Name == "Craft" then
-                local petName = v.Parent:FindFirstChild("PetName").Value
-                if petName and petName ~= "Space" and table.find(petNamesToDelete, petName) then
-                    for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.UI.Pages.Pets.Main.Main:GetDescendants()) do
-                        if v.Name == "Check" and v:IsA("Frame") and v.Visible ~= true then
-                            local args = {
-                                [1] = "Delete",
-                                [2] = {
-                                    [1] = v.Parent.Parent.Name
-                                }
-                            }
-                            
-                            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PetFunctions"):InvokeServer(unpack(args))
-                        end
-                    end
-                end
-            end
-        end
-    end
 end
